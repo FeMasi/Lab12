@@ -13,7 +13,7 @@ class Controller:
         self._listCountry = []
         self.selectedCountry = None
         self.selectedYear = None
-
+        self.N = 0
 
 
     def fillDD(self):
@@ -55,6 +55,9 @@ class Controller:
 
 
     def handle_volume(self, e):
+        if self._model.get_num_of_nodes() == 0:
+            self._view.create_alert("é necessario prima creare il grafo")
+            return
         self._view.txtOut2.clean()
         self._model.calcolaVolumi()
         for x in self._model.get_volume_ret():
@@ -64,4 +67,26 @@ class Controller:
 
 
     def handle_path(self, e):
-        pass
+        self._view.txtOut3.clean()
+        if self._model.get_num_of_nodes() == 0:
+            self._view.create_alert("é necessario prima creare il grafo")
+            return
+        if self._model.volumi_calcolati is False:
+            self._view.create_alert("Calcola i volumi prima")
+            return
+        if self._view.txtN.value == "":
+            self._view.create_alert("Inserire una lunghezza di percorso superiore a 1")
+            return
+        self.N = int(self._view.txtN.value)
+        print(self.N)
+        if self.N<2:
+            self._view.create_alert("Per creare il percorso servono almeno due vertici")
+            return
+        self._model.get_path(self.N)
+
+        self._view.txtOut3.controls.append(ft.Text(f"Il percorso ha un peso totale di: {str(self._model.solBest)}"))
+
+        for x in self._model.path_edges:
+            self._view.txtOut3.controls.append(ft.Text(f"{x[0].Retailer_name} --> {x[1].Retailer_name} con peso di: {str(x[2])}"))
+
+        self._view.update_page()
